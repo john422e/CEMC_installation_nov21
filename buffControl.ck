@@ -29,7 +29,7 @@ OscMsg msg;
 in.listenAll();
 
 // sensor vars
-90.0 => float maxDist; // distance maximum (lower values trigger sound)
+100.0 => float maxDist; // distance maximum (lower values trigger sound)
 30.0 => float minDist; // distance minimum (higher values trigger sound)
 10.0 => float distOffset; // set for each sensor to compensate for irregularities
 float dist;
@@ -45,12 +45,12 @@ path + "m26.wav" => string buf2fn;
 <<< buf1fn, buf2fn >>>;
 
 // sound
-2 => int numChan;
+2 => int numBufs;
 [buf1fn, buf2fn] @=> string bufFNs[];
-SndBuf buffers[numChan];
-int bufSize[numChan];
-Envelope bufEnvs[numChan];
-Pan2 bufPans[numChan];
+SndBuf buffers[numBufs];
+int bufSize[numBufs];
+Envelope bufEnvs[numBufs];
+Pan2 bufPans[numBufs];
 // Sines
 5 => int numSines;
 SinOsc sines[numSines];
@@ -59,7 +59,7 @@ Pan2 sinPans[numSines];
 Gain sinGains[numSines];
 
 // set up soundchains for buffers
-for( 0 => int i; i < numChan; i++ ) {
+for( 0 => int i; i < numBufs; i++ ) {
 	// read and set buffers
 	bufFNs[i] => buffers[i].read;
 	buffers[i].samples() => bufSize[i]; // don't think i need this
@@ -160,7 +160,7 @@ fun void get_osc() {
 					bufEnvs[0].keyOn();
 					sinEnvs[0].keyOn();
 				}
-				if( dist > maxDist ) offCount++;
+				if( dist > (maxDist*1.5) ) offCount++;
 			}
 		}
 	}
@@ -178,12 +178,24 @@ while( true ) {
 	1::second => now;
 	second_i++;
 	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
+	// turn off sound when 
 	if( offCount >= offThresh ) {
 		// turn everything off
-		bufEnvs[0].keyOff();
-		bufEnvs[1].keyOff();
+		for( 0 => int i; i < numBufs; i++ ) {
+			2 => bufEnvs[i].time;
+			bufEnvs.keyOff();
+		}
 		for( 0 => int i; i < numSines; i++ ) {
+			2 => sinEnvs[i].time;
 			sinEnvs[i].keyOff();
+		}
+		2::second => now;
+		// reset env time
+		for( 0 => int i; i < numBufs; i++ ) {
+			0.1 => bufEnvs[i].time;
+		}
+		for( 0 => int i; i < numSines; i++ ) {
+			0.1 => sinEnvs[i].time;
 		}
 	}
 }
