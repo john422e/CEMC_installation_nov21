@@ -36,7 +36,7 @@ float dist;
 float amp1;
 float amp2;
 0 => int offCount; // track time since qualifying distance value
-1000 => int offThresh; // turn sound off when count exceeds this
+10 => int offThresh; // turn sound off when count exceeds this
 
 // file handling
 me.dir() + "audio/" => string path;
@@ -182,7 +182,8 @@ while( true ) {
 		// turn everything off
 		bufEnvs[0].keyOff();
 		bufEnvs[1].keyOff();
-		sinEnvs[0].keyOff();
-		sinEnvs[1].keyOff();
+		for( 0 => int i; i < numSines; i++ ) {
+			sinEnvs[i].keyOff();
+		}
 	}
 }
