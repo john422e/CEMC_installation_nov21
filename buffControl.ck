@@ -183,7 +183,7 @@ while( true ) {
 		// turn everything off
 		for( 0 => int i; i < numBufs; i++ ) {
 			2 => bufEnvs[i].time;
-			bufEnvs.keyOff();
+			bufEnvs[i].keyOff();
 		}
 		for( 0 => int i; i < numSines; i++ ) {
 			2 => sinEnvs[i].time;
