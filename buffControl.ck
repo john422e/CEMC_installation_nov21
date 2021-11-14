@@ -29,7 +29,8 @@ OscMsg msg;
 in.listenAll();
 
 // sensor vars
-45.0 => float thresh; // distance thresh (lower values trigger sound)
+90.0 => float maxDist; // distance maximum (lower values trigger sound)
+30.0 => float minDist; // distance minimum (higher values trigger sound)
 10.0 => float distOffset; // set for each sensor to compensate for irregularities
 float dist;
 float amp1;
@@ -167,9 +168,9 @@ spork ~ get_osc(); // start sensor listener
 
 0 => int second_i;
 
+<<< "STARTING PIECE" >>>;
 // run forever
 while( true ) {
-	<<< "STARTING PIECE" >>>;
 	1::second => now;
 	second_i++;
 	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
