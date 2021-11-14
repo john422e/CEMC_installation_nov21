@@ -1,0 +1,4 @@
+DATE: next MONDAY TUESDAY WEDNESDAY?
+
+
+think two speakers/pis with pulsing oscs and patchbay? switch between waveforms or freqs? sensors for speed of pulse?
