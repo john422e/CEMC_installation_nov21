@@ -18,8 +18,10 @@
 
 [ 535.7, 642.6, 857.5, 1142.9, 1499.9 ] @=> float group5[];
 [ 0, 26, 26, 12, 12 ] @=> int group5pos[];
+
 [group0, group1, group2, group3, group4, group5] @=> float groups[][];
-[group0pos, group1pos, group2pos, group3pos, group4pos, group5pos] @=> int groupPos[][];		
+[group0pos, group1pos, group2pos, group3pos, group4pos, group5pos] @=> int groupPos[][];
+	
 // osc
 OscIn in;
 OscMsg msg;
@@ -107,6 +109,17 @@ fun float normalize( float inVal, float x1, float x2 ) {
 	return outVal;
 }
 
+fun void getNewGroup() {
+	// sets globals, returns nothing
+	Math.random2(0, groups.size() - 1) => currentGroup;
+	for( 0 => int i; i < numSines; i++ ) {
+		groups[currentGroup][i] => sines[i].freq;
+		if( groupPos[currentGroup][i] == 12 ) -1 => sinPans[i].pan;
+		if( groupPos[currentGroup][i] == 26 ) 1 => sinPans[i].pan;
+		else 0 => sinPans[i].pan;
+	}
+}
+
 fun void get_osc() {
 	while( true ) {
 		// check for osc messages
@@ -118,21 +131,13 @@ fun void get_osc() {
 				//spork ~ main();
 			};
 			// get random group
-			if( msg.address == "/newGroup" ) {
-				Math.random2(0, groups.size() - 1) => currentGroup;
-				for( 0 => int i; i < numSines; i++ ) {
-					groups[currentGroup][i] => sines[i].freq;
-					if( groupPos[currentGroup][i] == 12 ) -1 => sinPans[i].pan;
-					if( groupPos[currentGroup][i] == 26 ) 1 => sinPans[i].pan;
-					else 0 => sinPans[i].pan;
-				}
-			};
+			if( msg.address == "/newGroup" ) getNewGroup();
 				
 			// ultrasonic sensor distance
 			if( msg.address == "/distance" ) {
 				msg.getFloat(0) => dist;
 				<<< "/distance", dist >>>;
-				// turn on sound if value below thresh and get tone
+				// set amps from value if distance within range
 				if( dist <= thresh && dist > 0.0 ) {
 					normalize(dist, thresh, distOffset) => amp1;
 					1 - amp1 => amp2;
@@ -157,10 +162,11 @@ fun void get_osc() {
 // this will trigger everything when /beginPiece comes in from masterSpeakerCtl.ck
 spork ~ get_osc(); // start sensor listener
 
+0 => int second_i;
+
 // run forever
 while( true ) {
 	1::second => now;
+	second_i++;
+	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
 }
-
-
-// create a time interval or control for changing group periodically
