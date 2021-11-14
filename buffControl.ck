@@ -111,6 +111,7 @@ fun float normalize( float inVal, float x1, float x2 ) {
 
 fun void getNewGroup() {
 	// sets globals, returns nothing
+	<<< "NEW GROUP" >>>;
 	Math.random2(0, groups.size() - 1) => currentGroup;
 	for( 0 => int i; i < numSines; i++ ) {
 		groups[currentGroup][i] => sines[i].freq;
@@ -119,6 +120,8 @@ fun void getNewGroup() {
 		else 0 => sinPans[i].pan;
 	}
 }
+
+getNewGroup(); // initialize
 
 fun void get_osc() {
 	while( true ) {
@@ -166,6 +169,7 @@ spork ~ get_osc(); // start sensor listener
 
 // run forever
 while( true ) {
+	<<< "STARTING PIECE" >>>;
 	1::second => now;
 	second_i++;
 	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
