@@ -35,6 +35,8 @@ in.listenAll();
 float dist;
 float amp1;
 float amp2;
+0 => int offCount; // track time since qualifying distance value
+1000 => int offThresh; // turn sound off when count exceeds this
 
 // file handling
 me.dir() + "audio/" => string path;
@@ -143,6 +145,7 @@ fun void get_osc() {
 				<<< "/distance", dist >>>;
 				// set amps from value if distance within range
 				if( dist <= maxDist && dist > minDist ) {
+					0 => offCount; // reset count
 					normalize(dist, maxDist, minDist) => amp1; // does minDist need to be distOffset?
 					1 - amp1 => amp2;
 					<<< amp1, amp2 >>>;
@@ -156,7 +159,8 @@ fun void get_osc() {
 					amp2 => sinEnvs[0].target;
 					bufEnvs[0].keyOn();
 					sinEnvs[0].keyOn();
-				}		
+				}
+				if( dist > maxDist ) offCount++;
 			}
 		}
 	}
@@ -174,4 +178,11 @@ while( true ) {
 	1::second => now;
 	second_i++;
 	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
+	if( offCount >= offThresh ) {
+		// turn everything off
+		bufEnvs[0].keyOff();
+		bufEnvs[1].keyOff();
+		sinEnvs[0].keyOff();
+		sinEnvs[1].keyOff();
+	}
 }
