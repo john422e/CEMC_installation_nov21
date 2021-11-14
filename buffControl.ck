@@ -142,8 +142,8 @@ fun void get_osc() {
 				msg.getFloat(0) => dist;
 				<<< "/distance", dist >>>;
 				// set amps from value if distance within range
-				if( dist <= thresh && dist > 0.0 ) {
-					normalize(dist, thresh, distOffset) => amp1;
+				if( dist <= maxDist && dist > minDist ) {
+					normalize(dist, maxDist, minDist) => amp1; // does minDist need to be distOffset?
 					1 - amp1 => amp2;
 					<<< amp1, amp2 >>>;
 					amp1 => bufEnvs[0].target;
