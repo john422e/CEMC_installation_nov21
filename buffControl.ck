@@ -37,6 +37,7 @@ float amp1;
 float amp2;
 0 => int offCount; // track time since qualifying distance value
 10 => int offThresh; // turn sound off when count exceeds this
+0 => int soundState; // boolean 0 or 1
 
 // file handling
 me.dir() + "audio/" => string path;
@@ -145,6 +146,7 @@ fun void get_osc() {
 				<<< "/distance", dist >>>;
 				// set amps from value if distance within range
 				if( dist <= maxDist && dist > minDist ) {
+					1 => soundState;
 					0 => offCount; // reset count
 					normalize(dist, maxDist, minDist) => amp1; // does minDist need to be distOffset?
 					1 - amp1 => amp2;
@@ -179,8 +181,9 @@ while( true ) {
 	second_i++;
 	if( second_i % 600 == 0 ) getNewGroup(); // set new group every ten minutes
 	// turn off sound when 
-	if( offCount >= offThresh ) {
+	if( (offCount >= offThresh) && (soundState == 1) ) {
 		// turn everything off
+		0 => soundState;
 		for( 0 => int i; i < numBufs; i++ ) {
 			2 => bufEnvs[i].time;
 			bufEnvs[i].keyOff();
